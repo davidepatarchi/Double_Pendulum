@@ -88,8 +88,9 @@ void Pendulum::evolution(Pendulum &pendulum) {
   double w2 = pendulum.omega();
   double delta = theta_ - pendulum.theta();
 
-  alpha_ = (-m2 * L1 * w1 * w1 * std::sin(delta) * std::cos(delta) -
+  alpha_ = (-m2 * L1 * w1 * w1 * std::sin(delta) * std::cos(delta) +
             m2 * constants::g * std::sin(th2) * std::cos(delta) -
+            m2 * L2 * w2 * w2 * std::sin(delta) -
             (m1 + m2) * constants::g * std::sin(th1)) /
            (L1 * (m1 + m2 * std::sin(delta) * std::sin(delta)));
   pendulum.alpha() =
