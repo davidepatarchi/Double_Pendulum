@@ -3,7 +3,7 @@
 
 namespace pnd {
 namespace constants {
-inline constexpr double dt = 0.001;
+inline constexpr double dt = 1e-4;
 inline constexpr double g = 9.81;
 } // namespace constants
 
@@ -22,30 +22,28 @@ vec2 operator*(double k, vec2 const &v); // factor on the left
 
 class Pendulum {
 private:
-  vec2 origin_;
   double lenght_;
-  double angle_;
   double mass_;
-  vec2 position_;
-  vec2 velocity_;
-  vec2 acceleration_;
+  double theta_;
+  double omega_;
+  double alpha_;
 
   void check_lenght();
-  void check_angle();
   void check_mass();
-  void check_position();
-  void check_velocity();
-  void check_acceleration();
+  void check_state();
 
 public:
-  Pendulum(vec2 const &origin, double lenght, double angle, double mass);
+  Pendulum(double lenght, double mass, double theta);
 
-  vec2 origin();
-  double lenght();
-  double angle();
-  vec2 position();
+  double pos_x(double origin_x);
+  double pos_y(double origin_y);
+  double &lenght();
+  double &mass();
+  double &theta();
+  double &omega();
+  double &alpha();
 
-  void evolution();
+  void evolution(Pendulum &pendulum);
 };
 
 } // namespace pnd

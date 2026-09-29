@@ -3,18 +3,24 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <numbers>
 
 int main() {
   try {
     sf::RenderWindow window(sf::VideoMode({800, 800}), "Double Pendulum");
 
-    float length = 300.f;
-    float angle = 0.5f;
-    sf::Vector2f origin(400.f, 200.f);
-    double m = 1.;
+    float lenght1 = 150.f;
+    double mass1 = 10.;
+    float theta1 = 1.5f;
 
-    pnd::Pendulum pend({origin.x / pix::scale, origin.y / pix::scale},
-                       length / pix::scale, angle, m);
+    float lenght2 = 150.f;
+    double mass2 = 10.;
+    float theta2 = 0.;
+
+    sf::Vector2f origin(400.f, 400.f);
+
+    pnd::Pendulum pendulum1{lenght1 / pix::scale, mass1, theta1};
+    pnd::Pendulum pendulum2{lenght2 / pix::scale, mass2, theta2};
 
     while (window.isOpen()) {
       while (const auto event = window.pollEvent()) {
@@ -22,20 +28,38 @@ int main() {
           window.close();
       }
 
-      pend.evolution();
+      pendulum1.evolution(pendulum2);
 
-      sf::RectangleShape rod;
-      rod.setSize({length, 4.f});
-      rod.setFillColor(sf::Color::White);
-      rod.setOrigin({0.f, 2.f});
-      rod.setPosition(origin);
-      rod.setRotation(sf::radians(angle));
+      float x1 = float(pendulum1.pos_x(0.));
+      float x2 = float(pendulum2.pos_x(x1));
+      float y1 = float(pendulum1.pos_y(0.));
+      float y2 = float(pendulum2.pos_y(x2));
 
-      sf::CircleShape mass(20.f);
-      mass.setFillColor(sf::Color::Red);
-      mass.setOrigin({20.f, 20.f});
-      mass.setPosition({float(pend.position().x * pix::scale),
-                        float(pend.position().y * pix::scale)});
+      sf::RectangleShape rod1;
+      rod1.setSize({lenght1, 4.f});
+      rod1.setFillColor(sf::Color::White);
+      rod1.setOrigin({0.f, 2.f});
+      rod1.setPosition(origin);
+      rod1.setRotation(
+          sf::radians(float((std::numbers::pi / 2.0) - pendulum1.theta())));
+
+      sf::RectangleShape rod2;
+      rod1.setSize({lenght2, 4.f});
+      rod1.setFillColor(sf::Color::White);
+      rod1.setOrigin({0.f, 2.f});
+      rod1.setPosition(sf::Vector2f({x1, y1}));
+      rod1.setRotation(
+          sf::radians(float((std::numbers::pi / 2.0) - pendulum2.theta())));
+
+      sf::CircleShape point1(10.f);
+      point1.setFillColor(sf::Color::Red);
+      point1.setOrigin({10.f, 10.f});
+      point1.setPosition({pix_pos_x(x1), pix_pos_y(y1)});
+
+      sf::CircleShape point2(10.f);
+      point1.setFillColor(sf::Color::Red);
+      point1.setOrigin({10.f, 10.f});
+      point1.setPosition({pix_pos_x(x2), pix_pos_y(y2)});
 
       sf::CircleShape pivot(8.f);
       pivot.setFillColor(sf::Color::White);
@@ -44,8 +68,10 @@ int main() {
 
       window.clear(sf::Color::Black);
 
-      window.draw(rod);
-      window.draw(mass);
+      window.draw(rod1);
+      window.draw(point1);
+      window.draw(rod2);
+      window.draw(point2);
       window.draw(pivot);
 
       window.display();
