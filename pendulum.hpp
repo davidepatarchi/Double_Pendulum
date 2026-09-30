@@ -46,6 +46,7 @@ public:
   double &alpha();
 
   void evolution(Pendulum &pendulum);
+  double energy(Pendulum &pendulum);
 };
 
 } // namespace pnd

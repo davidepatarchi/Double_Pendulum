@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
   bool dragging1 = false;
   bool dragging2 = false;
 
+  std::cout << pendulum1.energy(pendulum2) << '\n';
+
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
 
@@ -190,5 +192,7 @@ int main(int argc, char *argv[]) {
     window.draw(pivot);
 
     window.display();
+
+    std::cout << pendulum1.energy(pendulum2) << '\n';
   }
 }

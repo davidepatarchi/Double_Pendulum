@@ -101,6 +101,21 @@ void Pendulum::evolution(Pendulum &pendulum) {
     pendulum.theta() -= 2 * std::numbers::pi;
   }
 }
+
+double Pendulum::energy(Pendulum &pendulum) {
+  double kinetic1 = 0.5 * mass_ * lenght_ * lenght_ * omega_ * omega_;
+  double kinetic2 = 0.5 * pendulum.mass() * pendulum.lenght() *
+                    pendulum.lenght() * pendulum.omega() * pendulum.omega();
+  double kinetic12 = pendulum.mass() * lenght_ * pendulum.lenght() * omega_ *
+                     pendulum.omega() * std::cos(theta_ - pendulum.theta());
+  double potential1 =
+      mass_ * constants::g * (lenght_ + pendulum.lenght() - std::cos(theta_));
+  double potential2 =
+      mass_ * constants::g *
+      (lenght_ + pendulum.lenght() - std::cos(pendulum.theta()));
+
+  return kinetic1 + kinetic2 + kinetic12 + potential1 + potential2;
+}
 // PENDULUM
 
 } // namespace pnd
