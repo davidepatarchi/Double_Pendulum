@@ -1,6 +1,8 @@
 #ifndef PENDULUM_HPP
 #define PENDULUM_HPP
 
+#include <numbers>
+
 namespace pnd {
 namespace constants {
 inline constexpr double dt = 1e-4;

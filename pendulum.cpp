@@ -4,27 +4,6 @@
 #include <stdexcept>
 
 namespace pnd {
-
-// VEC2
-vec2 vec2::operator+(vec2 const &v) { return {x + v.x, y + v.y}; }
-vec2 vec2::operator-(vec2 const &v) { return {x - v.x, y - v.y}; }
-vec2 vec2::operator*(double k) { return {x * k, y * k}; }
-vec2 operator*(double k, vec2 const &v) { return {v.x * k, v.y * k}; }
-vec2 vec2::operator/(double k) {
-  if (k == 0.) {
-    throw std::invalid_argument("Error: division by 0");
-  }
-  double val_x = x / k;
-  double val_y = y / k;
-  if (std::isfinite(val_x) == false || std::isfinite(val_y) == false) {
-    throw std::invalid_argument("Error: impossible division");
-  }
-  return {val_x, val_y};
-}
-double vec2::norm() { return std::sqrt(x * x + y * y); }
-double vec2::norm2() { return x * x + y * y; }
-// VEC2
-
 // PENDULUM
 void Pendulum::check_mass() {
   if (mass_ <= 0. || isfinite(mass_) == false) {
@@ -77,6 +56,10 @@ void Pendulum::evolution(Pendulum &pendulum) {
   pendulum.theta() += pendulum.omega() * constants::dt +
                       0.5 * pendulum.alpha() * constants::dt * constants::dt;
 
+  // velocity prediction
+  omega_ += alpha_ * constants::dt;
+  pendulum.omega() += pendulum.alpha() * constants::dt;
+
   // acceleration
   double m1 = mass_;
   double m2 = pendulum.mass();
@@ -105,6 +88,18 @@ void Pendulum::evolution(Pendulum &pendulum) {
   pendulum.omega() += (pendulum.alpha() + alpha2) * 0.5 * constants::dt;
 
   check_state();
+  if (theta_ < -std::numbers::pi) {
+    theta_ += 2 * std::numbers::pi;
+  }
+  if (theta_ > std::numbers::pi) {
+    theta_ -= 2 * std::numbers::pi;
+  }
+  if (pendulum.theta() < -std::numbers::pi) {
+    pendulum.theta() += 2 * std::numbers::pi;
+  }
+  if (pendulum.theta() > std::numbers::pi) {
+    pendulum.theta() -= 2 * std::numbers::pi;
+  }
 }
 // PENDULUM
 
