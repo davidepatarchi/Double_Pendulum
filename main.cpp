@@ -9,29 +9,31 @@ int main(int argc, char *argv[]) {
   }
 
   sf::RenderWindow window(sf::VideoMode({800, 800}), "Double Pendulum");
+  window.setFramerateLimit(60);
 
   float lenght1 = 150.f;
   double mass1 = 10.;
-  float theta1;
+  float lenght2 = 150.f;
+  double mass2 = 10.;
+
+  double theta1;
   if (argc > 1) {
-    theta1 = float(std::stof(argv[1]) * 0.017);
+    theta1 = std::stod(argv[1]) * std::numbers::pi / 180.;
   } else {
     theta1 = 0.f;
   }
-
-  float lenght2 = 150.f;
-  double mass2 = 10.;
   double theta2;
-  if (argc > 1) {
-    theta2 = float(std::stof(argv[1]) * 0.017);
+  if (argc > 2) {
+    theta2 = std::stod(argv[2]) * std::numbers::pi / 180.;
   } else {
     theta2 = 0.f;
   }
 
-  sf::Vector2f origin(400.f, 400.f);
+  pnd::State state{theta1, theta2, 0., 0.};
+  pnd::DoublePendulum pend{lenght1 / pix::scale, mass1, lenght2 / pix::scale,
+                           mass2, state};
 
-  pnd::Pendulum pendulum1{lenght1 / pix::scale, mass1, theta1};
-  pnd::Pendulum pendulum2{lenght2 / pix::scale, mass2, theta2};
+  sf::Vector2f origin(400.f, 400.f);
 
   sf::RectangleShape vert1;
   vert1.setSize({2.f, lenght1 / 3});
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
   bool dragging1 = false;
   bool dragging2 = false;
 
-  std::cout << pendulum1.energy(pendulum2) << '\n';
+  std::cout << pend.energy() << '\n';
 
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
@@ -53,14 +55,7 @@ int main(int argc, char *argv[]) {
 
       if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
         if (key->code == sf::Keyboard::Key::Space) {
-          pendulum1.theta() = 0.;
-          pendulum2.theta() = 0.;
-
-          pendulum1.omega() = 0.;
-          pendulum2.omega() = 0.;
-
-          pendulum1.alpha() = 0.;
-          pendulum2.alpha() = 0.;
+          pend.state() = {0., 0., 0., 0.};
         }
       }
 
@@ -70,12 +65,11 @@ int main(int argc, char *argv[]) {
           sf::Vector2f mouse_position{float(mouse->position.x),
                                       float(mouse->position.y)};
 
-          sf::Vector2f position1{pix_pos_x(pendulum1.pos_x(0.)),
-                                 pix_pos_y(pendulum1.pos_y(0.))};
+          sf::Vector2f position1{pix_pos_x(pend.pos_x1(0.)),
+                                 pix_pos_y(pend.pos_y1(0.))};
 
-          sf::Vector2f position2{
-              pix_pos_x(pendulum2.pos_x(pendulum1.pos_x(0.))),
-              pix_pos_y(pendulum2.pos_y(pendulum1.pos_y(0.)))};
+          sf::Vector2f position2{pix_pos_x(pend.pos_x2(pend.pos_x1(0.))),
+                                 pix_pos_y(pend.pos_y2(pend.pos_y1(0.)))};
 
           float distance1 = std::hypot(mouse_position.x - position1.x,
                                        mouse_position.y - position1.y);
@@ -107,47 +101,47 @@ int main(int argc, char *argv[]) {
         float dx = mouse.x - origin.x;
         float dy = mouse.y - origin.y;
 
-        pendulum1.theta() = std::atan2(dx, dy);
-        pendulum1.omega() = 0.;
-        pendulum2.omega() = 0.;
+        pend.state().theta1 = std::atan2(dx, dy);
+        pend.state().omega1 = 0.0;
       }
 
       if (dragging2) {
 
-        float x1 = float(pendulum1.pos_x(0.));
-        float y1 = float(pendulum1.pos_y(0.));
+        float x1 = float(pend.pos_x1(0.));
+        float y1 = float(pend.pos_y1(0.));
 
         sf::Vector2f pivot{pix_pos_x(x1), pix_pos_y(y1)};
 
         float dx = mouse.x - pivot.x;
         float dy = mouse.y - pivot.y;
 
-        pendulum2.theta() = std::atan2(dx, dy);
-        pendulum2.omega() = 0.;
-        pendulum1.omega() = 0.;
+        pend.state().theta2 = std::atan2(dx, dy);
+        pend.state().omega2 = 0.0;
       }
     }
 
-    pendulum1.evolution(pendulum2);
+    for (int i{0}; i < 17; ++i) {
+      pend.evolution();
+    }
 
-    float x1 = float(pendulum1.pos_x(0.));
-    float x2 = float(pendulum2.pos_x(x1));
-    float y1 = float(pendulum1.pos_y(0.));
-    float y2 = float(pendulum2.pos_y(y1));
+    float x1 = float(pend.pos_x1(0.));
+    float x2 = float(pend.pos_x2(x1));
+    float y1 = float(pend.pos_y1(0.));
+    float y2 = float(pend.pos_y2(y1));
 
     sf::RectangleShape rod1;
     rod1.setSize({4.f, lenght1});
     rod1.setFillColor(sf::Color::Magenta);
     rod1.setOrigin({2.f, 0.f});
     rod1.setPosition(origin);
-    rod1.setRotation(sf::radians(float(-pendulum1.theta())));
+    rod1.setRotation(sf::radians(float(-pend.state().theta1)));
 
     sf::RectangleShape rod2;
     rod2.setSize({4.f, lenght2});
     rod2.setFillColor(sf::Color::Cyan);
     rod2.setOrigin({2.f, 0.f});
     rod2.setPosition(sf::Vector2f({pix_pos_x(x1), pix_pos_y(y1)}));
-    rod2.setRotation(sf::radians(float(-pendulum2.theta())));
+    rod2.setRotation(sf::radians(float(-pend.state().theta2)));
 
     sf::CircleShape point1(10.f);
     point1.setFillColor(sf::Color::White);
@@ -170,14 +164,15 @@ int main(int argc, char *argv[]) {
     vert2.setOrigin({1.f, 0.f});
     vert2.setPosition(sf::Vector2f{pix_pos_x(x1), pix_pos_y(y1)});
 
-    sf::VertexArray arc1 = drawArc(
-        origin, lenght1 / 4.f, float(std::numbers::pi / 2.f),
-        float(std::numbers::pi / 2.f - pendulum1.theta()), sf::Color::Magenta);
+    sf::VertexArray arc1 =
+        drawArc(origin, lenght1 / 4.f, float(std::numbers::pi / 2.f),
+                float(std::numbers::pi / 2.f - pend.state().theta1),
+                sf::Color::Magenta);
 
     sf::VertexArray arc2 = drawArc(
         sf::Vector2f{pix_pos_x(x1), pix_pos_y(y1)}, lenght1 / 4.f,
         float(std::numbers::pi / 2.f),
-        float(std::numbers::pi / 2.f - pendulum2.theta()), sf::Color::Cyan);
+        float(std::numbers::pi / 2.f - pend.state().theta2), sf::Color::Cyan);
 
     window.clear(sf::Color::Black);
 
@@ -192,7 +187,6 @@ int main(int argc, char *argv[]) {
     window.draw(pivot);
 
     window.display();
-
-    std::cout << pendulum1.energy(pendulum2) << '\n';
   }
+  std::cout << pend.energy() << '\n';
 }
