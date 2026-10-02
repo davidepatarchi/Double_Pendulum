@@ -71,3 +71,6 @@ Testing/
 
 # virtual enviroments
 .venv
+
+#vscode
+.vscode
