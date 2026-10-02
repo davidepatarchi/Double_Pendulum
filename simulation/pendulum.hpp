@@ -48,7 +48,8 @@ public:
 
   State derive(State const &state);
   void evolution();
-  double energy();
+  double kinetic();
+  double potential();
 };
 
 } // namespace pnd

@@ -119,19 +119,23 @@ void DoublePendulum::evolution() {
   }
 }
 
-double DoublePendulum::energy() {
+double DoublePendulum::kinetic() {
   double kinetic1 = 0.5 * (mass1_ + mass2_) * lenght1_ * lenght1_ *
                     state_.omega1 * state_.omega1;
   double kinetic2 =
       0.5 * mass2_ * lenght2_ * lenght2_ * state_.omega2 * state_.omega2;
   double kinetic12 = mass2_ * lenght1_ * lenght2_ * state_.omega1 *
                      state_.omega2 * std::cos(state_.theta1 - state_.theta2);
+
+  return kinetic1 + kinetic2 + kinetic12;
+}
+double DoublePendulum::potential() {
   double potential1 = (mass1_ + mass2_) * constants::g * lenght1_ *
                       (1 - std::cos(state_.theta1));
   double potential2 =
       mass2_ * constants::g * lenght2_ * (1 - std::cos(state_.theta2));
 
-  return kinetic1 + kinetic2 + kinetic12 + potential1 + potential2;
+  return potential1 + potential2;
 }
 // PENDULUM
 

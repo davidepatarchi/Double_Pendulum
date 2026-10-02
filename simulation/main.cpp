@@ -1,6 +1,7 @@
 #include "pendulum.hpp"
 #include "render.hpp"
 
+#include <fstream>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
@@ -44,7 +45,16 @@ int main(int argc, char *argv[]) {
   bool dragging1 = false;
   bool dragging2 = false;
 
-  std::cout << pend.energy() << '\n';
+  double T{0.};
+  double K{0.};
+  double U{0.};
+  double E{0.};
+
+  std::ofstream file("../data/energy.csv");
+  if (!file.is_open()) {
+    std::cerr << "Could not open energy.csv\n";
+  }
+  file << "Time,Kinetic,Potential,Total\n";
 
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
@@ -174,6 +184,12 @@ int main(int argc, char *argv[]) {
         float(std::numbers::pi / 2.f),
         float(std::numbers::pi / 2.f - pend.state().theta2), sf::Color::Cyan);
 
+    T += 17 * pnd::constants::dt;
+    K = pend.kinetic();
+    U = pend.potential();
+    E = K + U;
+    file << T << ',' << K << ',' << U << ',' << E << '\n';
+
     window.clear(sf::Color::Black);
 
     window.draw(rod1);
@@ -188,5 +204,5 @@ int main(int argc, char *argv[]) {
 
     window.display();
   }
-  std::cout << pend.energy() << '\n';
+  file.close();
 }

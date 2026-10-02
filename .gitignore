@@ -40,6 +40,7 @@
 *.app
 
 # Build directories
+simulation/build/
 build/
 Build/
 build-*/
@@ -67,3 +68,6 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# virtual enviroments
+.venv
