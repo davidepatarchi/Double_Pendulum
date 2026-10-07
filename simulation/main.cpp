@@ -1,5 +1,5 @@
+#include "../rendering/render.hpp"
 #include "pendulum.hpp"
-#include "render.hpp"
 
 #include <fstream>
 #include <iostream>

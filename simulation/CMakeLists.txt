@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(progettopf VERSION 0.1.0)
+project(Double_Pendulum VERSION 0.1.0)
 
 include(CTest)
 
@@ -26,7 +26,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG " -fsanitize=address,undefined")
 
-find_package(SFML 3 COMPONENTS Graphics REQUIRED)
+find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 
-add_executable(progetto main.cpp pendulum.cpp render.cpp)
-target_link_libraries(progetto PRIVATE SFML::Graphics)
+add_executable(progetto main.cpp pendulum.cpp ../rendering/render.cpp)
+target_link_libraries(progetto PRIVATE SFML::Graphics SFML::Window SFML::System)
