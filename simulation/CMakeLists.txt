@@ -26,7 +26,23 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG " -fsanitize=address,undefined")
 
-find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
+# Physics engine: no graphics dependency, so that it can be unit-tested without
+# SFML and without opening any window.
+add_library(pendulum STATIC pendulum.cpp)
+target_include_directories(pendulum PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(progetto main.cpp pendulum.cpp ../rendering/render.cpp)
-target_link_libraries(progetto PRIVATE SFML::Graphics SFML::Window SFML::System)
+# Graphical application. Turn OFF to build only the engine and the tests on a
+# machine without SFML (cmake -S . -B build -DDP_BUILD_APP=OFF).
+option(DP_BUILD_APP "Build the SFML graphical application" ON)
+if (DP_BUILD_APP)
+  find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
+
+  add_executable(progetto main.cpp ../rendering/render.cpp)
+  target_link_libraries(progetto PRIVATE pendulum SFML::Graphics SFML::Window
+                                         SFML::System)
+endif()
+
+# Unit tests (run with: ctest --test-dir <build-dir> --output-on-failure)
+if (BUILD_TESTING)
+  add_subdirectory(../tests tests)
+endif()

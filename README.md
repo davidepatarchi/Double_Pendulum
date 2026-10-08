@@ -369,6 +369,35 @@ This behaviour is one of the main reasons why the double pendulum is interesting
 
 ---
 
+## 4. Testing
+
+The physics engine (`simulation/pendulum.*`) is covered by an automated test
+suite based on [doctest](https://github.com/doctest/doctest), located in
+`tests/`. The tests do not use SFML and do not open any window.
+
+```bash
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+On a machine without SFML, build only the engine and the tests with
+`cmake -S . -B build -DDP_BUILD_APP=OFF`. doctest is downloaded automatically at
+configure time (an installed copy is used if available).
+
+| Suite | What it verifies |
+| --- | --- |
+| `dynamics` | equations of motion against an independent Lagrangian derivation, fourth-order convergence of RK4, regression against high-accuracy reference solutions, angle wrapping, input validation |
+| `energy` | kinetic and potential energy against geometric derivations, consistency of the energy with the equations of motion, energy conservation and its `dt^4` scaling |
+| `physics` | equilibria, analytic normal modes of small oscillations, single-pendulum limit, mirror symmetry, mass and length scaling laws, geometry |
+
+The reference solutions used for the regression tests are produced
+independently of the C++ code by `tests/reference/generate_reference.py`
+(equations derived symbolically from the Lagrangian with sympy, integrated with
+DOP853 and cross-checked with Radau).
+
+---
+
 ## Project Structure
 
 ```text
