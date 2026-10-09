@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("../data/energy.csv")
+data = pd.read_csv("data/energy.csv")
 
 plt.plot(data["Time"], data["Kinetic"], label="Kinetic")
 plt.plot(data["Time"], data["Potential"], label="Potential")

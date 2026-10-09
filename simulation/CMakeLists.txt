@@ -37,8 +37,8 @@ option(DP_BUILD_APP "Build the SFML graphical application" ON)
 if (DP_BUILD_APP)
   find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
 
-  add_executable(progetto main.cpp ../rendering/render.cpp)
-  target_link_libraries(progetto PRIVATE pendulum SFML::Graphics SFML::Window
+  add_executable(double_pendulum main.cpp ../rendering/render.cpp)
+  target_link_libraries(double_pendulum PRIVATE pendulum SFML::Graphics SFML::Window
                                          SFML::System)
 endif()
 

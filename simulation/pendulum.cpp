@@ -95,14 +95,14 @@ State DoublePendulum::derive(State const &state) {
   return derived;
 }
 
-void DoublePendulum::evolution() {
+void DoublePendulum::evolution(double dt) {
   // RK4 evolution
   State k1 = derive(state_);
-  State k2 = derive(state_ + k1 * (constants::dt / 2));
-  State k3 = derive(state_ + k2 * (constants::dt / 2));
-  State k4 = derive(state_ + k3 * constants::dt);
+  State k2 = derive(state_ + k1 * (dt / 2));
+  State k3 = derive(state_ + k2 * (dt / 2));
+  State k4 = derive(state_ + k3 * dt);
 
-  state_ = state_ + (k1 + k2 * 2. + k3 * 2. + k4) * (constants::dt / 6);
+  state_ = state_ + (k1 + k2 * 2. + k3 * 2. + k4) * (dt / 6);
 
   check_state();
   if (state_.theta1 < -std::numbers::pi) {

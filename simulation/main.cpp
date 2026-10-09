@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   double U{0.};
   double E{0.};
 
-  std::ofstream file("../data/energy.csv");
+  std::ofstream file("data/energy.csv");
   if (!file.is_open()) {
     std::cerr << "Could not open energy.csv\n";
   }

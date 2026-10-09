@@ -19,16 +19,16 @@ FetchContent_Declare(
   FIND_PACKAGE_ARGS 2.4.11 CONFIG)
 FetchContent_MakeAvailable(doctest)
 
-add_executable(pendulum_tests
+add_executable(double_pendulum_tests
   main.cpp
   test_dynamics.cpp
   test_energy.cpp
   test_physics.cpp)
-target_link_libraries(pendulum_tests PRIVATE pendulum doctest::doctest)
+target_link_libraries(double_pendulum_tests PRIVATE pendulum doctest::doctest)
 
 # One ctest entry per suite (TEST_SUITE_BEGIN in each file). On failure
 # `ctest --output-on-failure` prints the doctest report with the offending
 # assertion, the values involved and the INFO/CAPTURE context.
 foreach(suite IN ITEMS dynamics energy physics)
-  add_test(NAME ${suite} COMMAND pendulum_tests --test-suite=${suite})
+  add_test(NAME ${suite} COMMAND double_pendulum_tests --test-suite=${suite})
 endforeach()

@@ -47,7 +47,7 @@ public:
   State &state();
 
   State derive(State const &state);
-  void evolution();
+  void evolution(double dt = constants::dt);
   double kinetic();
   double potential();
 };
