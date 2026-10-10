@@ -123,11 +123,11 @@ $$
 
 where:
 
-* \(\theta_1,\theta_2\) are the angular positions;
-* \(\omega_1=\dot{\theta}_1\) and \(\omega_2=\dot{\theta}_2\) are the angular velocities;
-* \(m_1,m_2\) are the masses;
-* \(L_1,L_2\) are the rod lengths;
-* \(g\) is the gravitational acceleration.
+* $(\theta_1,\theta_2)$ are the angular positions;
+* $(\omega_1=\dot{\theta}_1)$ and $(\omega_2=\dot{\theta}_2)$ are the angular velocities;
+* $(m_1,m_2)$ are the masses;
+* $(L_1,L_2)$ are the rod lengths;
+* $(g)$ is the gravitational acceleration.
 
 The angles are measured from the downward vertical direction.
 
@@ -159,7 +159,7 @@ These transformations connect the physical model to the graphical representation
 
 The dynamics can be derived using Newton's laws or, equivalently, the Euler–Lagrange equations.
 
-For generalized coordinates \(q_i=\theta_i\), the Lagrangian formulation gives
+For generalized coordinates $ q_i=\theta_i $, the Lagrangian formulation gives
 
 $$
 \frac{d}{dt}
@@ -175,7 +175,7 @@ $$
 \mathcal L=T-V
 $$
 
-is the Lagrangian, with \(T\) the kinetic energy and \(V\) the gravitational potential energy.
+is the Lagrangian, with $T$ the kinetic energy and $V$ the gravitational potential energy.
 
 The resulting equations can be expressed as a first-order system:
 
@@ -197,13 +197,13 @@ $$
 \dot\omega_2=\alpha_2,
 $$
 
-where \(\alpha_1\) and \(\alpha_2\) are the coupled angular accelerations implemented by the simulation engine.
+where $\alpha_1$ and $\alpha_2$ are the coupled angular accelerations implemented by the simulation engine.
 
 ### Numerical integration
 
 The continuous equations of motion must be integrated numerically to obtain the state at successive time steps.
 
-The numerical integrator advances the state from \(t_n\) to \(t_{n+1}=t_n+\Delta t\). The choice of integration algorithm and time step affects the accuracy and long-term behaviour of the numerical solution.
+The numerical integrator advances the state from $t_n$ to $t_{n+1}=t_n+\Delta t$. The choice of integration algorithm and time step affects the accuracy and long-term behaviour of the numerical solution.
 
 The implementation of the integrator belongs to the simulation engine in `simulation/`.
 
@@ -218,21 +218,18 @@ For a conservative mechanical system, numerical integration should be assessed n
 The total mechanical energy is
 
 $$
-E=T+V,
+E=T+V
 $$
 
-where \(T\) is the kinetic energy and \(V\) is the gravitational potential energy.
+where $T$ is the kinetic energy and $V$ is the gravitational potential energy.
 
 For the ideal double pendulum, the kinetic energy is
 
 $$
-\begin{aligned}
-T={}&
+T=
 \frac12 m_1L_1^2\omega_1^2
-+\frac12 m_2L_2^2\omega_2^2\\
-&+m_2L_1L_2\omega_1\omega_2
-\cos(\theta_1-\theta_2).
-\end{aligned}
++\frac12 m_2L_2^2\omega_2^2 + m_2L_1L_2\omega_1\omega_2
+\cos(\theta_1-\theta_2)
 $$
 
 The third term is the coupling contribution. It arises because the motion of the second mass depends on the motion of the first.
@@ -241,19 +238,19 @@ Choosing the potential energy to vanish when both pendulums are in their lowest 
 
 $$
 V=(m_1+m_2)gL_1(1-\cos\theta_1)
-+m_2gL_2(1-\cos\theta_2).
++m_2gL_2(1-\cos\theta_2)
 $$
 
 Consequently,
 
 $$
-\boxed{E(t)=T(t)+V(t)}.
+\boxed{E(t)=T(t)+V(t)}
 $$
 
 For an ideal system without dissipative forces, the exact mechanical energy is conserved:
 
 $$
-E(t)=E(0).
+E(t)=E(0)
 $$
 
 In a numerical simulation, deviations from this equality can reveal integration errors, finite-time-step effects, or inconsistencies in the implementation.
@@ -278,14 +275,14 @@ The analysis can be used to investigate:
 A useful diagnostic is the absolute energy deviation,
 
 $$
-\Delta E(t)=E(t)-E(0),
+\Delta E(t)=E(t)-E(0)
 $$
 
-or, when \(E(0)\ne0\), the relative energy error,
+or, when $E(0)\ne0$, the relative energy error,
 
 $$
 \varepsilon_E(t)=
-\frac{|E(t)-E(0)|}{|E(0)|}.
+\frac{|E(t)-E(0)|}{|E(0)|}
 $$
 
 Comparing these quantities across simulations with different time steps provides a more rigorous assessment of numerical accuracy than visual inspection alone.
@@ -331,22 +328,34 @@ Passing tests helps establish the correctness of individual components, but it d
 The repository separates the simulation engine, graphical rendering, automated tests, and data analysis.
 
 ```text
-Double_Pendulum/
+.
+├── analysis
+│   ├── plot_energy.py
+│   └── requirements.txt
+├── build
+│   └── ...
 ├── CMakeLists.txt
-├── simulation/
-│   ├── CMakeLists.txt
-│   └── ...
-├── rendering/
-│   └── ...
-├── tests/
-│   └── ...
-├── analysis/
-│   └── plot_energy.py
-├── data/
-│   └── energy.csv
-├── requirements.txt
-├── .gitignore
-└── README.md
+├── data
+│   └── energy.csv
+├── README.md
+├── rendering
+│   ├── render.cpp
+│   └── render.hpp
+├── simulation
+│   ├── CMakeLists.txt
+│   ├── main.cpp
+│   ├── pendulum.cpp
+│   └── pendulum.hpp
+└── tests
+    ├── CMakeLists.txt
+    ├── main.cpp
+    ├── reference
+    ├── test_dynamics.cpp
+    ├── test_energy.cpp
+    ├── test_physics.cpp
+    └── test_utils.hpp
+
+
 ```
 
 ### Main components
