@@ -159,13 +159,13 @@ These transformations connect the physical model to the graphical representation
 
 The dynamics can be derived using Newton's laws or, equivalently, the Euler–Lagrange equations.
 
-For generalized coordinates $ q_i=\theta_i $, the Lagrangian formulation gives
+For generalized coordinates $q_i=\theta_i$, the Lagrangian formulation gives
 
 $$
 \frac{d}{dt}
 \left(\frac{\partial \mathcal L}
 {\partial\dot q_i}\right)
--
+\-
 \frac{\partial\mathcal L}{\partial q_i}=0,
 $$
 
