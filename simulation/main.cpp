@@ -9,9 +9,7 @@ int main(int argc, char *argv[]) {
     throw std::runtime_error("Error: expected not more than 3 imput values");
   }
 
-  sf::RenderWindow window(sf::VideoMode({800, 800}), "Double Pendulum");
-  window.setFramerateLimit(60);
-
+  // creating the initial state and the double pedulum
   float lenght1 = 150.f;
   double mass1 = 10.;
   float lenght2 = 150.f;
@@ -33,8 +31,17 @@ int main(int argc, char *argv[]) {
   pnd::State state{theta1, theta2, 0., 0.};
   pnd::DoublePendulum pend{lenght1 / pix::scale, mass1, lenght2 / pix::scale,
                            mass2, state};
-
   sf::Vector2f origin(400.f, 400.f);
+
+  // creating the graphical window, the pivot and the first vertical line (they
+  // don't need to be drawn more then one time)
+  sf::RenderWindow window(sf::VideoMode({800, 800}), "Double Pendulum");
+  window.setFramerateLimit(60);
+
+  sf::CircleShape pivot(5.f);
+  pivot.setFillColor(sf::Color::White);
+  pivot.setOrigin({5.f, 5.f});
+  pivot.setPosition(origin);
 
   sf::RectangleShape vert1;
   vert1.setSize({2.f, lenght1 / 3});
@@ -42,9 +49,12 @@ int main(int argc, char *argv[]) {
   vert1.setOrigin({0., 1.f});
   vert1.setPosition(origin);
 
+  // setting dragging information at their initial state
   bool dragging1 = false;
   bool dragging2 = false;
 
+  // creating the energy file and all the necessary variables (time, kinetic,
+  // potential and total energy)
   double T{0.};
   double K{0.};
   double U{0.};
@@ -56,6 +66,7 @@ int main(int argc, char *argv[]) {
   }
   file << "Time,Kinetic,Potential,Total\n";
 
+  // starting with the graphical simulation
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
 
@@ -63,12 +74,14 @@ int main(int argc, char *argv[]) {
         window.close();
       }
 
+      // if "space" is pressed, the simulation stops
       if (const auto *key = event->getIf<sf::Event::KeyPressed>()) {
         if (key->code == sf::Keyboard::Key::Space) {
           pend.state() = {0., 0., 0., 0.};
         }
       }
 
+      // if the mouse grabs a particle, its positions follows the mouse
       if (const auto *mouse = event->getIf<sf::Event::MouseButtonPressed>()) {
         if (mouse->button == sf::Mouse::Button::Left) {
 
@@ -103,6 +116,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    // set the new position of the particle when it's grabbed
     if (dragging1 || dragging2) {
       sf::Vector2i mouse_pixel = sf::Mouse::getPosition(window);
       sf::Vector2f mouse{float(mouse_pixel.x), float(mouse_pixel.y)};
@@ -130,10 +144,12 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    // SPIEGARE PERCHE' 17
     for (int i{0}; i < 17; ++i) {
       pend.evolution();
     }
 
+    // getting particles position in order to draw the double pendulum
     float x1 = float(pend.pos_x1(0.));
     float x2 = float(pend.pos_x2(x1));
     float y1 = float(pend.pos_y1(0.));
@@ -163,11 +179,6 @@ int main(int argc, char *argv[]) {
     point2.setOrigin({10.f, 10.f});
     point2.setPosition({pix_pos_x(x2), pix_pos_y(y2)});
 
-    sf::CircleShape pivot(5.f);
-    pivot.setFillColor(sf::Color::White);
-    pivot.setOrigin({5.f, 5.f});
-    pivot.setPosition(origin);
-
     sf::RectangleShape vert2;
     vert2.setSize({2.f, lenght2 / 3});
     vert2.setFillColor(sf::Color::Cyan);
@@ -184,6 +195,8 @@ int main(int argc, char *argv[]) {
         float(std::numbers::pi / 2.f),
         float(std::numbers::pi / 2.f - pend.state().theta2), sf::Color::Cyan);
 
+    // getting time, kinetic, potential and total energy and putting them in the
+    // energy file
     T += 17 * pnd::constants::dt;
     K = pend.kinetic();
     U = pend.potential();
