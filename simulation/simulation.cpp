@@ -27,9 +27,11 @@ void simulation(double theta1, double theta2, const std::string &filename,
     file << t << ',' << K << ',' << U << ',' << K + U << '\n';
   };
 
-  write_row(0.); // stato iniziale
+  // write_row(0.); // stato iniziale
   for (long i = 0; i < n_steps; ++i) {
     pend.evolution();
-    write_row(static_cast<double>(i + 1) * pnd::constants::dt);
+    if (i > 1'000'000) {
+      write_row(static_cast<double>(i + 1) * pnd::constants::dt);
+    }
   }
 }
