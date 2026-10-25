@@ -1,40 +1,35 @@
+#include "simulation.hpp"
 #include "pendulum.hpp"
+
 #include <fstream>
-#include <iostream>
-#include <string>
+#include <iomanip>
+#include <stdexcept>
 
-std::ofstream simulation(double theta1, double theta2, std::string filename,
-                         float lenght1 = 0.5, float lenght2 = 0.5,
-                         double mass1 = 10., double mass2 = 10.,
-                         double dt = pnd::constants::dt) {
-  // setting initial variables
-  double T{0.};
-  double K{0.};
-  double U{0.};
-  double E{0.};
+void simulation(double theta1, double theta2, const std::string &filename,
+                long n_steps, double length1, double length2, double mass1,
+                double mass2) {
+  theta1 *= std::numbers::pi / 180.;
+  theta2 *= std::numbers::pi / 180.;
 
-  // creating csv file w columns names: Time, Kinetic, Potential, Total
   std::ofstream file(filename);
-  if (!file.is_open()) {
-    std::cerr << "Could not open energy.csv\n";
-  }
+  if (!file.is_open())
+    throw std::runtime_error("Could not open " + filename);
+
+  file << std::setprecision(17);
   file << "Time,Kinetic,Potential,Total\n";
 
-  // creating the double pendulum
   pnd::State state{theta1, theta2, 0., 0.};
-  pnd::DoublePendulum pend{lenght1, mass1, lenght2, mass2, state};
+  pnd::DoublePendulum pend{length1, mass1, length2, mass2, state};
 
-  // evolving
-  for (long int i{0}; i < 1e9; ++i) {
+  auto write_row = [&](double t) {
+    double K = pend.kinetic();
+    double U = pend.potential();
+    file << t << ',' << K << ',' << U << ',' << K + U << '\n';
+  };
+
+  write_row(0.); // stato iniziale
+  for (long i = 0; i < n_steps; ++i) {
     pend.evolution();
-
-    T += dt;
-    K = pend.kinetic();
-    U = pend.potential();
-    E = K + U;
-    file << T << ',' << K << ',' << U << ',' << E << '\n';
+    write_row(static_cast<double>(i + 1) * pnd::constants::dt);
   }
-
-  file.close();
-  return file;
 }

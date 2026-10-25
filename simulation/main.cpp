@@ -134,10 +134,10 @@ int main(int argc, char *argv[]) {
         float x1 = float(pend.pos_x1(0.));
         float y1 = float(pend.pos_y1(0.));
 
-        sf::Vector2f pivot{pix_pos_x(x1), pix_pos_y(y1)};
+        sf::Vector2f drag_vec{pix_pos_x(x1), pix_pos_y(y1)};
 
-        float dx = mouse.x - pivot.x;
-        float dy = mouse.y - pivot.y;
+        float dx = mouse.x - drag_vec.x;
+        float dy = mouse.y - drag_vec.y;
 
         pend.state().theta2 = std::atan2(dx, dy);
         pend.state().omega2 = 0.0;

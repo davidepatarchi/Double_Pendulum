@@ -24,7 +24,7 @@ add_executable(double_pendulum_tests
   test_dynamics.cpp
   test_energy.cpp
   test_physics.cpp)
-target_link_libraries(double_pendulum_tests PRIVATE pendulum doctest::doctest)
+target_link_libraries(double_pendulum_tests PRIVATE pendulum_lib doctest::doctest)
 
 # One ctest entry per suite (TEST_SUITE_BEGIN in each file). On failure
 # `ctest --output-on-failure` prints the doctest report with the offending
